@@ -4,9 +4,9 @@ import requests
 import logging
 import re
 # When running locally
-from webapp.services.aiservice.app.schemas.responses import Smell
+"""from webapp.services.aiservice.app.schemas.responses import Smell"""
 # When running with Docker
-"""from app.schemas.responses import Smell"""
+from app.schemas.responses import Smell
 
 
 class Model:
