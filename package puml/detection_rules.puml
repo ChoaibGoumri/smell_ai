@@ -1,0 +1,144 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "detection_rules" {
+  package "chain_indexing_smell" {
+    class "api_specific.chain_indexing_smell.ChainIndexingSmell" as api_specific_chain_indexing_smell_ChainIndexingSmell {
+      + __init__()
+      + detect()
+    }
+  }
+  package "dataframe_conversion_api_misused" {
+    class "api_specific.dataframe_conversion_api_misused.DataFrameConversionAPIMisused" as api_specific_dataframe_conversion_api_misused_DataFrameConversionAPIMisused {
+      + __init__()
+      + detect()
+    }
+  }
+  package "gradients_not_cleared_before_backward_propagation" {
+    class "api_specific.gradients_not_cleared_before_backward_propagation.GradientsNotClearedSmell" as api_specific_gradients_not_cleared_before_backward_propagation_GradientsNotClearedSmell {
+      + __init__()
+      + detect()
+    }
+  }
+  package "matrix_multiplication_api_misused" {
+    class "api_specific.matrix_multiplication_api_misused.MatrixMultiplicationAPIMisused" as api_specific_matrix_multiplication_api_misused_MatrixMultiplicationAPIMisused {
+      + __init__()
+      + _is_matrix_multiplication()
+      + detect()
+    }
+  }
+  package "pytorch_call_method_misused" {
+    class "api_specific.pytorch_call_method_misused.PyTorchCallMethodMisusedSmell" as api_specific_pytorch_call_method_misused_PyTorchCallMethodMisusedSmell {
+      + __init__()
+      + _get_base_name()
+      + detect()
+    }
+  }
+  package "tensor_array_not_used" {
+    class "api_specific.tensor_array_not_used.TensorArrayNotUsedSmell" as api_specific_tensor_array_not_used_TensorArrayNotUsedSmell {
+      + __init__()
+      + _extract_tensor_name_from_call()
+      + _extract_tensor_names_from_concat()
+      + _find_parent_node()
+      + _is_in_loop()
+      + detect()
+    }
+  }
+  package "broadcasting_feature_not_used" {
+    class "generic.broadcasting_feature_not_used.BroadcastingFeatureNotUsedSmell" as generic_broadcasting_feature_not_used_BroadcastingFeatureNotUsedSmell {
+      + __init__()
+      + _check_broadcasting()
+      + _is_tile_call()
+      + _tensor_check_tiling()
+      + detect()
+    }
+  }
+  package "columns_and_datatype_not_explicitly_set" {
+    class "generic.columns_and_datatype_not_explicitly_set.ColumnsAndDatatypeNotExplicitlySetSmell" as generic_columns_and_datatype_not_explicitly_set_ColumnsAndDatatypeNotExplicitlySetSmell {
+      + __init__()
+      + detect()
+    }
+  }
+  package "deterministic_algorithm_option_not_used" {
+    class "generic.deterministic_algorithm_option_not_used.DeterministicAlgorithmOptionSmell" as generic_deterministic_algorithm_option_not_used_DeterministicAlgorithmOptionSmell {
+      + __init__()
+      + _get_full_function_name()
+      + detect()
+    }
+  }
+  package "empty_column_misinitialization" {
+    class "generic.empty_column_misinitialization.EmptyColumnMisinitializationSmell" as generic_empty_column_misinitialization_EmptyColumnMisinitializationSmell {
+      + __init__()
+      + detect()
+    }
+  }
+  package "hyperparameters_not_explicitly_set" {
+    class "generic.hyperparameters_not_explicitly_set.HyperparametersNotExplicitlySetSmell" as generic_hyperparameters_not_explicitly_set_HyperparametersNotExplicitlySetSmell {
+      + __init__()
+      + _get_full_function_name()
+      + detect()
+    }
+  }
+  package "in_place_apis_misused" {
+    class "generic.in_place_apis_misused.InPlaceAPIsMisusedSmell" as generic_in_place_apis_misused_InPlaceAPIsMisusedSmell {
+      + __init__()
+      + _is_assignment()
+      + detect()
+    }
+  }
+  package "memory_not_freed" {
+    class "generic.memory_not_freed.MemoryNotFreedSmell" as generic_memory_not_freed_MemoryNotFreedSmell {
+      + __init__()
+      + _is_memory_freed_in_loop()
+      + _is_model_defined_in_loop()
+      + _is_nested_call()
+      + detect()
+    }
+  }
+  package "merge_api_parameter_not_explicitly_set" {
+    class "generic.merge_api_parameter_not_explicitly_set.MergeAPIParameterNotExplicitlySetSmell" as generic_merge_api_parameter_not_explicitly_set_MergeAPIParameterNotExplicitlySetSmell {
+      + __init__()
+      + detect()
+    }
+  }
+  package "nan_equivalence_comparison_misused" {
+    class "generic.nan_equivalence_comparison_misused.NanEquivalenceComparisonMisusedSmell" as generic_nan_equivalence_comparison_misused_NanEquivalenceComparisonMisusedSmell {
+      + __init__()
+      + _has_nan_comparison()
+      + _is_nan()
+      + detect()
+    }
+  }
+  package "unnecessary_iteration" {
+    class "generic.unnecessary_iteration.UnnecessaryIterationSmell" as generic_unnecessary_iteration_UnnecessaryIterationSmell {
+      + __init__()
+      + _has_inefficient_operations()
+      + _is_dataframe()
+      + _is_inefficient_iterable()
+      + detect()
+    }
+  }
+  package "smell" {
+    class "smell.Smell" as smell_Smell {
+      + __init__()
+      + detect()
+      + format_smell()
+    }
+  }
+}
+api_specific_chain_indexing_smell_ChainIndexingSmell --|> smell_Smell
+api_specific_dataframe_conversion_api_misused_DataFrameConversionAPIMisused --|> smell_Smell
+api_specific_gradients_not_cleared_before_backward_propagation_GradientsNotClearedSmell --|> smell_Smell
+api_specific_matrix_multiplication_api_misused_MatrixMultiplicationAPIMisused --|> smell_Smell
+api_specific_pytorch_call_method_misused_PyTorchCallMethodMisusedSmell --|> smell_Smell
+api_specific_tensor_array_not_used_TensorArrayNotUsedSmell --|> smell_Smell
+generic_broadcasting_feature_not_used_BroadcastingFeatureNotUsedSmell --|> smell_Smell
+generic_columns_and_datatype_not_explicitly_set_ColumnsAndDatatypeNotExplicitlySetSmell --|> smell_Smell
+generic_deterministic_algorithm_option_not_used_DeterministicAlgorithmOptionSmell --|> smell_Smell
+generic_empty_column_misinitialization_EmptyColumnMisinitializationSmell --|> smell_Smell
+generic_hyperparameters_not_explicitly_set_HyperparametersNotExplicitlySetSmell --|> smell_Smell
+generic_in_place_apis_misused_InPlaceAPIsMisusedSmell --|> smell_Smell
+generic_memory_not_freed_MemoryNotFreedSmell --|> smell_Smell
+generic_merge_api_parameter_not_explicitly_set_MergeAPIParameterNotExplicitlySetSmell --|> smell_Smell
+generic_nan_equivalence_comparison_misused_NanEquivalenceComparisonMisusedSmell --|> smell_Smell
+generic_unnecessary_iteration_UnnecessaryIterationSmell --|> smell_Smell
+@enduml

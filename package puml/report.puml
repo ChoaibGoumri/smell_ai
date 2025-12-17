@@ -1,0 +1,18 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "report" {
+  package "report_generator" {
+    class "report_generator.ReportGenerator" as report_generator_ReportGenerator {
+      + __init__()
+      + _find_project_details()
+      + _load_data()
+      + menu()
+      + project_report()
+      + run()
+      + smell_report()
+      + summary_report()
+      + visualize_smell_report()
+    }
+  }
+}
+@enduml

@@ -1,0 +1,43 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "components" {
+  package "inspector" {
+    class "inspector.Inspector" as inspector_Inspector {
+      + __init__()
+      + _setup()
+      + inspect()
+    }
+  }
+  package "project_analyzer" {
+    class "project_analyzer.ProjectAnalyzer" as project_analyzer_ProjectAnalyzer {
+      + __init__()
+      + _save_results()
+      + analyze_project()
+      + analyze_projects_parallel()
+      + analyze_projects_sequential()
+      + clean_output_directory()
+      + merge_all_results()
+    }
+  }
+  package "project_repository_cloner" {
+    class "project_repository_cloner.ProjectRepositoryCloner" as project_repository_cloner_ProjectRepositoryCloner {
+      + __init__()
+      + clean()
+      + debug_filter_repo()
+      + execute()
+      + filter_repos()
+      + get_debug_projects()
+      + get_projects()
+      + get_repo()
+      + setup()
+    }
+  }
+  package "rule_checker" {
+    class "rule_checker.RuleChecker" as rule_checker_RuleChecker {
+      + __init__()
+      + _setup_smells()
+      + rule_check()
+    }
+  }
+}
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "code_extractor" {
+  package "dataframe_extractor" {
+    class "dataframe_extractor.DataFrameExtractor" as dataframe_extractor_DataFrameExtractor {
+      + __init__()
+      + extract_dataframe_variables()
+      + load_dataframe_dict()
+      + track_dataframe_accesses()
+      + track_dataframe_methods()
+    }
+  }
+  package "library_extractor" {
+    class "library_extractor.LibraryExtractor" as library_extractor_LibraryExtractor {
+      + extract_libraries()
+      + get_library_aliases()
+      + get_library_of_node()
+    }
+  }
+  package "model_extractor" {
+    class "model_extractor.ModelExtractor" as model_extractor_ModelExtractor {
+      + __init__()
+      + check_model_method()
+      + load_model_dict()
+      + load_model_methods()
+      + load_tensor_operations_dict()
+    }
+  }
+  package "variable_extractor" {
+    class "variable_extractor.VariableExtractor" as variable_extractor_VariableExtractor {
+      + extract_variable_definitions()
+      + track_variable_usage()
+    }
+  }
+}
+@enduml

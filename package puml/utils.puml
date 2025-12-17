@@ -1,0 +1,23 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "utils" {
+  package "file_utils" {
+    class "file_utils.FileUtils" as file_utils_FileUtils {
+      + append_to_log()
+      + clean_directory()
+      + get_last_logged_project()
+      + get_python_files()
+      + initialize_log()
+      + merge_results()
+      + synchronized_append_to_log()
+    }
+  }
+  package "package_puml_generator" {
+    class "package_puml_generator.ClassInfo" as package_puml_generator_ClassInfo {
+      + __init__()
+      + alias()
+      + fqname()
+    }
+  }
+}
+@enduml

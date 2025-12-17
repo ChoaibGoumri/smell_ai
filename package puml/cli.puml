@@ -1,0 +1,12 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "cli" {
+  package "cli_runner" {
+    class "cli_runner.CodeSmileCLI" as cli_runner_CodeSmileCLI {
+      + __init__()
+      + execute()
+      + validate_args()
+    }
+  }
+}
+@enduml

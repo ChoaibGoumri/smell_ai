@@ -1,0 +1,30 @@
+@startuml
+skinparam classAttributeIconSize 0
+package "gui" {
+  package "code_smell_detector_gui" {
+    class "code_smell_detector_gui.CodeSmellDetectorGUI" as code_smell_detector_gui_CodeSmellDetectorGUI {
+      + __init__()
+      + choose_input_path()
+      + choose_output_path()
+      + configure_stdout()
+      + disable_key_press()
+      + run_analysis()
+      + run_program()
+      + setup_gui()
+    }
+  }
+  package "gui_runner" {
+    class "gui_runner.CodeSmileGUI" as gui_runner_CodeSmileGUI {
+      + __init__()
+      + run()
+    }
+  }
+  package "textbox_redirect" {
+    class "textbox_redirect.TextBoxRedirect" as textbox_redirect_TextBoxRedirect {
+      + __init__()
+      + flush()
+      + write()
+    }
+  }
+}
+@enduml
