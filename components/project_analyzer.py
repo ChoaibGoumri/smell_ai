@@ -2,7 +2,8 @@ import os
 import time
 import threading
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 from components.inspector import Inspector
 from utils.file_utils import FileUtils
 
@@ -75,14 +76,14 @@ class ProjectAnalyzer:
         to_save = pd.DataFrame(columns=col)
         total_smells = 0
 
-        for filename in filenames:
+        for filename in tqdm(filenames, desc=f"Analyzing {project_name}", unit="file"):
             try:
                 result = self.inspector.inspect(filename)
 
                 smell_count = len(result)
                 total_smells += smell_count
                 if smell_count > 0:
-                    print(
+                    tqdm.write(
                         f"Found {smell_count} code smells in file: {filename}"
                     )
                 to_save = pd.concat([to_save, result], ignore_index=True)
@@ -91,7 +92,7 @@ class ProjectAnalyzer:
                 os.makedirs(self.output_path, exist_ok=True)
                 with open(error_file, "a") as f:
                     f.write(f"Error in file {filename}: {str(e)}\n")
-                print(f"Error analyzing file: {filename} - {str(e)}")
+                tqdm.write(f"Error analyzing file: {filename} - {str(e)}")
                 continue
 
         self._save_results(to_save, "overview.csv")
@@ -129,7 +130,9 @@ class ProjectAnalyzer:
         start_time = time.time()
         total_smells = 0
 
-        for dirname in os.listdir(base_path):
+        # Get list of projects to iterate with progress bar
+        all_dirs = sorted(os.listdir(base_path))
+        for dirname in tqdm(all_dirs, desc="Total Progress", unit="project"):
             if dirname in {"output", "execution_log.txt"}:
                 continue
 
@@ -141,7 +144,7 @@ class ProjectAnalyzer:
             if not os.path.isdir(project_path):
                 continue
 
-            print(f"Analyzing project '{dirname}' sequentially...")
+            tqdm.write(f"Analyzing project '{dirname}' sequentially...")
             try:
                 filenames = FileUtils.get_python_files(project_path)
 
@@ -295,9 +298,13 @@ class ProjectAnalyzer:
             except Exception as e:
                 print(f"Error analyzing project '{dirname}': {str(e)}\n")
 
+        futures = []
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             for dirname in os.listdir(base_path):
-                executor.submit(analyze_and_count_smells, dirname)
+                futures.append(executor.submit(analyze_and_count_smells, dirname))
+            
+            for _ in tqdm(as_completed(futures), total=len(futures), desc="Parallel Analysis", unit="project"):
+                pass
 
         print(
             "Parallel execution completed in "
