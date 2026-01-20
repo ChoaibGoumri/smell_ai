@@ -1,12 +1,15 @@
 from fastapi import FastAPI
-# When running locally
-"""from webapp.services.aiservice.app.routers.detect_smell import (
-    router as detect_smell_router,
-)"""
-# When running with Docker
-from app.routers.detect_smell import (
-    router as detect_smell_router,
-)
+
+# Dynamic import for local vs docker execution
+try:
+    # Docker import
+    from app.routers.detect_smell import router as detect_smell_router
+except ImportError:
+    # Local import
+    from webapp.services.aiservice.app.routers.detect_smell import (
+        router as detect_smell_router,
+    )
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="AI Analysis Service")

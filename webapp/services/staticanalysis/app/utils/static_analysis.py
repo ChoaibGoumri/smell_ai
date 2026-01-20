@@ -15,7 +15,7 @@ def detect_static(code_snippet: str) -> dict:
     try:
         # Create a temporary file to analyze the code snippet
         with tempfile.NamedTemporaryFile(
-            suffix=".py", delete=False, mode="w"
+            suffix=".py", delete=False, mode="w", encoding="utf-8"
         ) as temp_file:
             temp_file.write(code_snippet)
             temp_file_path = temp_file.name
