@@ -18,6 +18,7 @@ from detection_rules.generic import (
     memory_not_freed,
     merge_api_parameter_not_explicitly_set,
     nan_equivalence_comparison_misused,
+    randomness_uncontrolled,
     unnecessary_iteration,
 )
 
@@ -112,5 +113,6 @@ class RuleChecker:
             MergeAPIParameterNotExplicitlySetSmell(),
             nan_equivalence_comparison_misused.
             NanEquivalenceComparisonMisusedSmell(),
+            randomness_uncontrolled.RandomnessUncontrolledSmell(),
             unnecessary_iteration.UnnecessaryIterationSmell(),
         ]
