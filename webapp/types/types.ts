@@ -7,17 +7,20 @@ export type ContextSmell = {
 };
 
 export type DetectResponse = {
-    success: boolean;
-    smells: ContextSmell[];
+  success: boolean;
+  smells: ContextSmell[];
+  loc?: number;
+  density?: number;
+  quality?: string;
 }
 
 export type GenerateReportResponse = {
-    report_data: Record<string, any>;
+  report_data: Record<string, any>;
 }
 
-export type ChartData = { 
+export type ChartData = {
   smell_name: string;
-  filename: string 
+  filename: string
 };
 
 export type ProjectType = {

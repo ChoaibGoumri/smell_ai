@@ -20,12 +20,31 @@ def detect_static(code_snippet: str) -> dict:
             temp_file.write(code_snippet)
             temp_file_path = temp_file.name
 
-        smells_df: pd.DataFrame = inspector.inspect(temp_file_path)
+        smells_df, loc = inspector.inspect(temp_file_path)
+        
+        # Calculate metrics
+        num_smells = len(smells_df) if not smells_df.empty else 0
+        density = 0.0
+        quality = "Unknown"
+        
+        if loc > 0:
+            density = num_smells / loc
+            if density < 0.005:
+                quality = "Low"
+            elif density < 0.05:
+                quality = "Medium"
+            else:
+                quality = "High"
 
         # Handle cases with no results
         if smells_df.empty:
-            return {"success": True,
-                    "response": "Static analysis returned no data"}
+            return {
+                "success": True, 
+                "response": "Static analysis returned no data",
+                "loc": loc,
+                "density": density,
+                "quality": quality
+            }
 
         smells = [
             Smell(
@@ -41,7 +60,13 @@ def detect_static(code_snippet: str) -> dict:
         # Clean up the temporary file
         os.remove(temp_file_path)
 
-        return {"success": True, "response": smells}
+        return {
+            "success": True, 
+            "response": smells,
+            "loc": loc,
+            "density": density,
+            "quality": quality
+        }
 
     except Exception as e:
         return {"success": False, "response": str(e)}

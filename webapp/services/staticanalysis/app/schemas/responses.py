@@ -20,6 +20,9 @@ class DetectSmellStaticResponse(BaseModel):
     """
     success: bool
     smells: Optional[Union[List[Smell], str]] = []
+    loc: Optional[int] = None
+    density: Optional[float] = None
+    quality: Optional[str] = None
 
     class Config:
         schema_extra = {

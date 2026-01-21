@@ -75,10 +75,12 @@ class ProjectAnalyzer:
         ]
         to_save = pd.DataFrame(columns=col)
         total_smells = 0
+        file_metrics = []
 
         for filename in tqdm(filenames, desc=f"Analyzing {project_name}", unit="file"):
             try:
-                result = self.inspector.inspect(filename)
+                result, loc = self.inspector.inspect(filename)
+                file_metrics.append({"filename": filename, "loc": loc})
 
                 smell_count = len(result)
                 total_smells += smell_count
@@ -96,6 +98,11 @@ class ProjectAnalyzer:
                 continue
 
         self._save_results(to_save, "overview.csv")
+        
+        # Save metrics
+        if file_metrics:
+            metrics_df = pd.DataFrame(file_metrics)
+            self._save_results(metrics_df, "file_metrics.csv")
 
         print(f"Finished analysis for project: {project_name}")
         print(
@@ -158,10 +165,12 @@ class ProjectAnalyzer:
                 ]
                 to_save = pd.DataFrame(columns=col)
                 project_smells = 0
+                file_metrics = []
 
                 for filename in filenames:
                     try:
-                        result = self.inspector.inspect(filename)
+                        result, loc = self.inspector.inspect(filename)
+                        file_metrics.append({"filename": filename, "loc": loc})
 
                         smell_count = len(result)
                         project_smells += smell_count
@@ -193,6 +202,17 @@ class ProjectAnalyzer:
                     )
                     to_save.to_csv(detailed_file_path, index=False)
                     print(f"Detailed results saved to {detailed_file_path}")
+
+                if file_metrics:
+                    details_path = os.path.join(
+                        self.output_path, "project_details"
+                    )
+                    os.makedirs(details_path, exist_ok=True)
+                    metrics_file_path = os.path.join(
+                        details_path, f"{dirname}_metrics.csv"
+                    )
+                    pd.DataFrame(file_metrics).to_csv(metrics_file_path, index=False)
+                    print(f"Metrics saved to {metrics_file_path}")
 
                 total_smells += project_smells
                 print(
@@ -252,10 +272,12 @@ class ProjectAnalyzer:
                 ]
                 to_save = pd.DataFrame(columns=col)
                 project_smells = 0
+                file_metrics = []
 
                 for filename in filenames:
                     try:
-                        result = self.inspector.inspect(filename)
+                        result, loc = self.inspector.inspect(filename)
+                        file_metrics.append({"filename": filename, "loc": loc})
 
                         smell_count = len(result)
                         project_smells += smell_count
@@ -286,7 +308,19 @@ class ProjectAnalyzer:
                         details_path, f"{dirname}_results.csv"
                     )
                     to_save.to_csv(detailed_file_path, index=False)
+
                     print(f"Detailed results saved to {detailed_file_path}")
+
+                if file_metrics:
+                    details_path = os.path.join(
+                        self.output_path, "project_details"
+                    )
+                    os.makedirs(details_path, exist_ok=True)
+                    metrics_file_path = os.path.join(
+                        details_path, f"{dirname}_metrics.csv"
+                    )
+                    pd.DataFrame(file_metrics).to_csv(metrics_file_path, index=False)
+                    print(f"Metrics saved to {metrics_file_path}")
 
                 total_smells += project_smells
 

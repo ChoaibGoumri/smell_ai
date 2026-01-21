@@ -29,5 +29,9 @@ async def detect_smell_static(payload: DetectSmellRequest):
     code_snippet = payload.code_snippet
     analysis_result = detect_static(code_snippet)
     return DetectSmellStaticResponse(
-        success=analysis_result["success"], smells=analysis_result["response"]
+        success=analysis_result["success"],
+        smells=analysis_result["response"],
+        loc=analysis_result.get("loc"),
+        density=analysis_result.get("density"),
+        quality=analysis_result.get("quality"),
     )
