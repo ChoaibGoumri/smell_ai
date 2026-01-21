@@ -53,11 +53,21 @@ class ModelExtractor:
             )
 
         df = pd.read_csv(self.models_path)
-        if "method" not in df.columns or "library" not in df.columns:
+        if (
+            "method" not in df.columns
+            or "library" not in df.columns
+            or "critical_hyperparameters" not in df.columns
+        ):
             raise ValueError(
-                "Expected columns 'method' and"
-                f"'library' not found in {self.models_path}"
+                "Expected columns 'method', 'library', and "
+                "'critical_hyperparameters' not found in "
+                f"{self.models_path}"
             )
+
+        # Handle NaN values in critical_hyperparameters (replace with empty string)
+        df["critical_hyperparameters"] = df["critical_hyperparameters"].fillna(
+            ""
+        )
 
         self.model_dict = df.to_dict(orient="list")
         return self.model_dict
