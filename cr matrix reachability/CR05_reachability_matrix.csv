@@ -1,0 +1,6 @@
+,DataFrameExtractor,FileInfo,GenerateReportResponse,Inspector,RuleChecker,
+DataFrameExtractor,0,-,-,-,-,
+FileInfo,-,0,-,-,-,
+GenerateReportResponse,-,1,0,-,-,
+Inspector,1,1,-,0,1,
+RuleChecker,-,-,-,-,0,

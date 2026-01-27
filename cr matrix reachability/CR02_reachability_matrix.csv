@@ -1,0 +1,6 @@
+,cli/cli_runner.py,components/project_analyzer.py,components/inspector.py,components/rule_checker.py,detection_rules/smell.py
+cli/cli_runner.py,0,1,2,3,4
+components/project_analyzer.py,1,0,1,2,3
+components/inspector.py,-,-,0,1,2
+components/rule_checker.py,-,-,-,0,1
+detection_rules/smell.py,-,-,-,-,0
