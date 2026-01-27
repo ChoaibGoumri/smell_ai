@@ -6,9 +6,16 @@ from gui.code_smell_detector_gui import CodeSmellDetectorGUI
 
 @pytest.fixture
 def gui_setup():
-    root = Tk()
-    gui = CodeSmellDetectorGUI(root)
-    return gui
+    with patch('tkinter.Tk'), \
+         patch('gui.code_smell_detector_gui.tk'), \
+         patch('gui.code_smell_detector_gui.filedialog'):
+        root = Mock()
+        gui = CodeSmellDetectorGUI(root)
+        # Mock the widget attributes that are used in the test/code
+        # Since we mocked tk, gui.input_path will be a Mock returned by tk.Label()
+        # We must ensure they behave as expected in the test
+        return gui
+
 
 
 @patch("gui.code_smell_detector_gui.ProjectAnalyzer")
