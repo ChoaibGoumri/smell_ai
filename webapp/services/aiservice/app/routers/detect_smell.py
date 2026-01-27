@@ -1,14 +1,17 @@
 import ast
 import logging
 from fastapi import APIRouter, HTTPException
-# When running locally
-"""from webapp.services.aiservice.app.schemas.requests import DetectSmellRequest
-from webapp.services.aiservice.app.schemas.responses import DetectSmellResponse
-from webapp.services.aiservice.app.utils.model import Model"""
-# When running with Docker
-from app.schemas.requests import DetectSmellRequest
-from app.schemas.responses import DetectSmellResponse
-from app.utils.model import Model
+# Dynamic import for local vs docker execution
+try:
+    # Docker import
+    from app.schemas.requests import DetectSmellRequest
+    from app.schemas.responses import DetectSmellResponse
+    from app.utils.model import Model
+except ImportError:
+    # Local import
+    from webapp.services.aiservice.app.schemas.requests import DetectSmellRequest
+    from webapp.services.aiservice.app.schemas.responses import DetectSmellResponse
+    from webapp.services.aiservice.app.utils.model import Model
 
 router = APIRouter()
 
