@@ -1,8 +1,13 @@
 from fastapi import FastAPI
-# when running locally/testing
-""" from webapp.services.report.app.routers.report import router as report_router """
-# when running in docker
-from app.routers.report import router as report_router
+
+# Dynamic import for local vs docker execution
+try:
+    # Docker import
+    from app.routers.report import router as report_router
+except ImportError:
+    # Local import
+    from webapp.services.report.app.routers.report import router as report_router
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Report Service")
