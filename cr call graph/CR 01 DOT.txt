@@ -1,0 +1,91 @@
+digraph CR1_ImpactAnalysis {
+    // Impostazioni Generali
+    rankdir=LR; // Da sinistra a destra
+    splines=ortho; // Linee ortogonali per ordine
+    node [shape=note, style=filled, fontname="Consolas", fontsize=10];
+    
+    // Legenda colori
+    // Arancione = File da Modificare
+    // Bianco = Contesto/Configurazione
+
+    // ---------------------------------------------------------
+    // 1. CONFIGURAZIONE ESTERNA
+    // ---------------------------------------------------------
+    subgraph cluster_infra {
+        label = "Infrastructure Config";
+        style=dashed;
+        color=grey;
+        
+        "docker-compose.yml" [fillcolor="#eeeeee", shape=box];
+    }
+
+    // ---------------------------------------------------------
+    // 2. WEBAPP GATEWAY (Gestione URL)
+    // ---------------------------------------------------------
+    subgraph cluster_gateway {
+        label = "webapp/gateway";
+        style=filled;
+        color=lightblue;
+        fillcolor="#e6f3ff";
+
+        "gateway/main.py" [fillcolor="#ffccbc", label="main.py\n(Fix URLs to Env Vars)"];
+    }
+
+    // ---------------------------------------------------------
+    // 3. AI SERVICE (Gestione Import)
+    // ---------------------------------------------------------
+    subgraph cluster_aiservice {
+        label = "webapp/services/aiservice";
+        style=filled;
+        color=gold;
+        fillcolor="#ffffe0";
+
+        "aiservice/main.py" [fillcolor="#ffccbc", label="app/main.py\n(Fix Imports)"];
+        "aiservice/router.py" [fillcolor="#ffccbc", label="app/routers/detect_smell.py\n(Fix Imports)"];
+    }
+
+    // ---------------------------------------------------------
+    // 4. STATIC ANALYSIS SERVICE (Gestione Import)
+    // ---------------------------------------------------------
+    subgraph cluster_static {
+        label = "webapp/services/staticanalysis";
+        style=filled;
+        color=lightgreen;
+        fillcolor="#e6fffa";
+
+        "static/main.py" [fillcolor="#ffccbc", label="app/main.py\n(Fix Imports)"];
+        "static/router.py" [fillcolor="#ffccbc", label="app/routers/detect_smell.py\n(Fix Imports)"];
+    }
+
+    // ---------------------------------------------------------
+    // 5. REPORT SERVICE (Gestione Import)
+    // ---------------------------------------------------------
+    subgraph cluster_report {
+        label = "webapp/services/report";
+        style=filled;
+        color=pink;
+        fillcolor="#ffe6e6";
+
+        "report/main.py" [fillcolor="#ffccbc", label="app/main.py\n(Fix Imports)"];
+        "report/router.py" [fillcolor="#ffccbc", label="app/routers/report.py\n(Fix Imports)"];
+    }
+
+    // ---------------------------------------------------------
+    // RELAZIONI (Edges)
+    // ---------------------------------------------------------
+
+    // Injection delle variabili d'ambiente (Docker -> Gateway)
+    "docker-compose.yml" -> "gateway/main.py" [label="injects ENV vars", style=dotted, color=grey];
+
+    // Chiamate HTTP (Gateway -> Servizi)
+    // Questo mostra perché devi configurare gli URL nel gateway
+    "gateway/main.py" -> "aiservice/main.py" [label="HTTP POST", style=dashed, color=blue];
+    "gateway/main.py" -> "static/main.py" [label="HTTP POST", style=dashed, color=blue];
+    "gateway/main.py" -> "report/main.py" [label="HTTP POST", style=dashed, color=blue];
+
+    // Dipendenze interne (Main -> Router)
+    // Qui c'è il problema degli import relativi/assoluti
+    "aiservice/main.py" -> "aiservice/router.py" [label="imports"];
+    "static/main.py" -> "static/router.py" [label="imports"];
+    "report/main.py" -> "report/router.py" [label="imports"];
+}

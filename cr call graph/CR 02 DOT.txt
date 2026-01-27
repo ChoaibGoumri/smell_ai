@@ -1,0 +1,73 @@
+digraph CR2_ProgressBar_ImpactAnalysis {
+    // Impostazioni Generali
+    rankdir=LR; // Da sinistra a destra
+    splines=ortho; // Linee ortogonali per ordine
+    node [shape=note, style=filled, fontname="Consolas", fontsize=10];
+    
+    // Legenda colori
+    // Arancione = File da Modificare (Alta priorità)
+    // Giallo = File da Modificare (Media priorità)
+    // Bianco = Contesto/Non modificato
+
+    // ---------------------------------------------------------
+    // 1. CLI LAYER (User Interface - Testuale)
+    // ---------------------------------------------------------
+    subgraph cluster_cli {
+        label = "CLI Interface";
+        style=filled;
+        color=blue;
+        fillcolor="#e6f3ff";
+
+        "cli/cli_runner.py" [fillcolor="#ffccbc", label="cli_runner.py\n(Add Progress Display\n+ Callback to Analyzer)"];
+    }
+
+    // ---------------------------------------------------------
+    // 2. ANALYSIS CORE (Backend Logic)
+    // ---------------------------------------------------------
+    subgraph cluster_analysis {
+        label = "components/";
+        style=filled;
+        color=green;
+        fillcolor="#e6ffe6";
+
+        "components/project_analyzer.py" [fillcolor="#ffccbc", label="project_analyzer.py\n(Add progress_callback param\n+ File counting logic)"];
+        "components/inspector.py" [fillcolor="#fff9c4", label="inspector.py\n(Optional: sub-progress\nfor file analysis)"];
+        "components/rule_checker.py" [fillcolor="#ffffff", label="rule_checker.py\n"];
+    }
+
+    // ---------------------------------------------------------
+    // 3. DETECTION RULES (Unchanged)
+    // ---------------------------------------------------------
+    subgraph cluster_rules {
+        label = "detection_rules/";
+        style=filled;
+        color=grey;
+        fillcolor="#f5f5f5";
+
+        "detection_rules/smell.py" [fillcolor="#ffffff", label="smell.py\n"];
+    }
+
+    // ---------------------------------------------------------
+    // 4. CODE EXTRACTION (Unchanged)
+    // ---------------------------------------------------------
+
+
+    // ---------------------------------------------------------
+    // RELAZIONI (Edges) - Flusso di esecuzione
+    // ---------------------------------------------------------
+
+    // User avvia analisi tramite CLI
+    "cli/cli_runner.py" -> "components/project_analyzer.py" [label="execute()\npasses progress_callback", style=bold, color=red];
+
+    // Analyzer analizza i file
+    "components/project_analyzer.py" -> "components/inspector.py" [label="analyze_file()\ncalls callback(current, total)\n\n", color=blue];
+
+    // Inspector usa RuleChecker (nessuna modifica)
+    "components/inspector.py" -> "components/rule_checker.py" [label="check_rules()\n\n", style=dashed, color=grey];
+
+    // RuleChecker usa Smell definitions (nessuna modifica)
+    "components/rule_checker.py" -> "detection_rules/smell.py" [label="validates against\n\n", style=dotted, color=grey];
+
+    // Feedback loop: Analyzer notifica CLI
+    "components/project_analyzer.py" -> "cli/cli_runner.py" [label="\ncallback(current, total)", style=dashed, color=red, dir=back];
+}

@@ -1,0 +1,88 @@
+digraph CR5_Density_Detailed {
+    // IMPOSTAZIONI GRAFICHE
+    rankdir=LR;          // Direzione Sinistra -> Destra
+    splines=spline;      // Linee curve per ospitare meglio il testo
+    ranksep=1.8;         // MOLTO spazio orizzontale per le etichette delle frecce
+    nodesep=0.8;         // Spazio verticale tra i nodi
+    
+    // Stile Nodi
+    node [shape=note, style="filled", fontname="Verdana", fontsize=10, margin="0.2,0.1"];
+    
+    // Stile Frecce (Etichette in corsivo e blu scuro per risaltare)
+    edge [fontname="Arial Italic", fontsize=9, fontcolor="#003366", color="#666666", arrowsize=0.8, labeldistance=2.0];
+
+    // ---------------------------------------------------------
+    // PACKAGE: CODE EXTRACTOR
+    // ---------------------------------------------------------
+    subgraph cluster_extractor {
+        label = "PACKAGE: code_extractor";
+        style=filled;
+        color="#e8f5e9"; // Verde chiaro
+        
+        "DataFrameExtractor" [
+            label = "FILE: dataframe_extractor.py\nCLASS: DataFrameExtractor\n(Modifica: Conta righe codice)", 
+            fillcolor="#ffccbc", color="#d84315"
+        ];
+    }
+
+    // ---------------------------------------------------------
+    // PACKAGE: COMPONENTS (LOGICA CORE)
+    // ---------------------------------------------------------
+    subgraph cluster_components {
+        label = "PACKAGE: components";
+        style=filled;
+        color="#fff8e1"; // Giallo chiaro
+
+        "Inspector" [
+            label = "FILE: inspector.py\nCLASS: Inspector\n(Modifica: Logica calcolo)", 
+            fillcolor="#ffccbc", color="#d84315"
+        ];
+
+        "RuleChecker" [
+            label = "FILE: rule_checker.py\nCLASS: RuleChecker\n(Analisi esistente)", 
+            fillcolor="#ffccbc"
+        ];
+
+        "FileInfo" [
+            label = "FILE: models.py\nCLASS: FileInfo\n(Modifica: Aggiungi campo 'density')", 
+            fillcolor="#ffccbc", color="#d84315"
+        ];
+    }
+
+    // ---------------------------------------------------------
+    // PACKAGE: WEBAPP (REPORT)
+    // ---------------------------------------------------------
+    subgraph cluster_webapp {
+        label = "PACKAGE: webapp/services/report";
+        style=filled;
+        color="#e3f2fd"; // Blu chiaro
+
+        "GenerateReportResponse" [
+            label = "FILE: schemas.py\nCLASS: ReportResponse\n(Modifica: Esponi JSON)", 
+            fillcolor="#ffccbc", color="#d84315"
+        ];
+    }
+
+    // ---------------------------------------------------------
+    // AZIONI E FLUSSO DATI
+    // ---------------------------------------------------------
+
+    // 1. Ottenimento dati grezzi
+    "Inspector" -> "DataFrameExtractor" [label="1. get_source_code_metrics()\n(Richiede LOC)"];
+
+    // 2. Analisi errori
+    "Inspector" -> "RuleChecker" [label="2. analyze_files()\n(Ritorna lista Smells)"];
+
+    // 3. Calcolo e Salvataggio (Tratteggiato perché è un aggiornamento dati interna)
+    "Inspector" -> "FileInfo" [
+        label="3. set_density(smells / loc)\n(Scrittura Dati)", 
+        style=dashed, color="#d84315", fontcolor="#d84315"
+    ];
+
+    // 4. Generazione Output
+    // La freccia va da Response a FileInfo per indicare che la Response "legge" da lì
+    "GenerateReportResponse" -> "FileInfo" [
+        dir=back, // La freccia punta indietro visivamente, ma logicamente è una lettura
+        label="4. read_density()\n(Lettura per Report)"
+    ];
+}
