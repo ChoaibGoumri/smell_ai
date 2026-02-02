@@ -16,13 +16,23 @@ def test_load_model_dict(mocker, extractor):
     mock_exists = mocker.patch("os.path.exists", return_value=True)
     mock_read_csv = mocker.patch("pandas.read_csv")
     mock_df = MagicMock()
-    mock_df.columns = ["method", "library"]
-    mock_df.to_dict.return_value = {"method": ["method1"], "library": ["lib1"]}
+    mock_df.columns = ["method", "library", "critical_hyperparameters"]
+    mock_df.__getitem__ = MagicMock(return_value=mock_df)
+    mock_df.fillna = MagicMock(return_value=mock_df)
+    mock_df.to_dict.return_value = {
+        "method": ["method1"], 
+        "library": ["lib1"],
+        "critical_hyperparameters": ["param1"]
+    }
     mock_read_csv.return_value = mock_df
 
     model_dict = extractor.load_model_dict()
 
-    assert model_dict == {"method": ["method1"], "library": ["lib1"]}
+    assert model_dict == {
+        "method": ["method1"], 
+        "library": ["lib1"],
+        "critical_hyperparameters": ["param1"]
+    }
     mock_exists.assert_called_once_with("models.csv")
     mock_read_csv.assert_called_once_with("models.csv")
 
@@ -146,3 +156,35 @@ def test_check_model_method_not_loaded(mocker, extractor):
     """Test that ValueError is raised if model dictionary is not loaded."""
     with pytest.raises(ValueError):
         extractor.check_model_method("method1", ["lib1"])
+
+
+def test_load_model_dict_with_nan_values(mocker, extractor):
+    """Test loading model dict with NaN values in critical_hyperparameters."""
+    mock_exists = mocker.patch("os.path.exists", return_value=True)
+    
+    # Create a real DataFrame with NaN values
+    df = pd.DataFrame({
+        "method": ["method1", "method2"],
+        "library": ["lib1", "lib2"],
+        "critical_hyperparameters": ["param1", None]  # NaN value
+    })
+    mock_read_csv = mocker.patch("pandas.read_csv", return_value=df)
+    
+    model_dict = extractor.load_model_dict()
+    
+    # Verify NaN was replaced with empty string
+    assert model_dict["critical_hyperparameters"][1] == ""
+    mock_exists.assert_called_once_with("models.csv")
+    mock_read_csv.assert_called_once_with("models.csv")
+
+
+def test_load_model_methods_missing_method_column(mocker, extractor):
+    """Test that ValueError is raised if 'method' column is missing."""
+    # Set a model_dict without 'method' column
+    extractor.model_dict = {
+        "library": ["lib1"],
+        "critical_hyperparameters": ["param1"]
+    }
+    
+    with pytest.raises(ValueError, match="'method' column not found"):
+        extractor.load_model_methods()
