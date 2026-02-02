@@ -1,0 +1,3 @@
+filename,function_name,smell_name,line,description,additional_info
+X:\UNI\MAGISTRALE\ISTA\CODESMILE\smell_ai\test\system_testing\TC_11\MultipleGenericSmells.py,matrix,matrix_multiplication_api_misused,12,Using `dot()` for matrix multiplication is discouraged. Use `np.matmul` instead.,"Detected misuse of `dot()` for matrix multiplication. Consider using `np.matmul` instead. Code:     result = np.dot(matrix_a, matrix_b)  # Punto di rilevamento # noqa"
+X:\UNI\MAGISTRALE\ISTA\CODESMILE\smell_ai\test\system_testing\TC_11\MultipleGenericSmells.py,load_data,columns_and_datatype_not_explicitly_set,15,Pandas' DataFrame or read_csv methods should explicitlyset 'dtype' to avoid unexpected behavior.,Missing explicit 'dtype'in read_csv call.
