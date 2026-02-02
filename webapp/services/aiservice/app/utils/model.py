@@ -3,10 +3,13 @@ import time
 import requests
 import logging
 import re
-# When running locally
-"""from webapp.services.aiservice.app.schemas.responses import Smell"""
-# When running with Docker
-from app.schemas.responses import Smell
+# Dynamic import for local vs docker execution
+try:
+    # Docker import
+    from app.schemas.responses import Smell
+except ImportError:
+    # Local import
+    from webapp.services.aiservice.app.schemas.responses import Smell
 
 
 class Model:

@@ -7,8 +7,11 @@ from webapp.gateway import main
 client = TestClient(main.app)
 
 
+from unittest.mock import patch, AsyncMock, MagicMock
+
 # Test case to check the generate_report endpoint with valid data
-def test_generate_report_valid_data():
+@patch("webapp.gateway.main.httpx.AsyncClient")
+def test_generate_report_valid_data(mock_client):
     payload = {
         "projects": [
             {
@@ -49,6 +52,18 @@ def test_generate_report_valid_data():
         }
     }
 
+    # Setup mock
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = expected_response
+
+    mock_post = AsyncMock()
+    mock_post.return_value = mock_response
+
+    mock_instance = mock_client.return_value
+    mock_instance.__aenter__.return_value.post = mock_post
+
     response = client.post("/api/generate_report", json=payload)
     assert response.status_code == 200
     assert response.json() == expected_response
+
