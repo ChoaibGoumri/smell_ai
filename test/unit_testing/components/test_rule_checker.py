@@ -166,3 +166,46 @@ def test_no_smells(mocker, mock_rule_checker, mock_ast_node, df_output):
 
     # Assertions
     assert len(result) == 0  # No smells detected
+
+
+def test_rule_check_with_exception(mocker, mock_rule_checker, mock_ast_node, df_output):
+    """
+    Test that exceptions in smell detection are handled gracefully.
+    """
+    from unittest.mock import patch
+    
+    # Mock a smell that raises an exception during detect
+    mock_smell = mocker.Mock()
+    mock_smell.detect.side_effect = Exception("Test exception in smell detection")
+    
+    # Replace smells list with the mock smell
+    mock_rule_checker.smells = [mock_smell]
+    
+    # Mocking extracted_data
+    extracted_data = {
+        "libraries": {"pandas": "pd"},
+        "variables": {},
+    }
+    
+    filename = "mock_file.py"
+    function_name = "test_function"
+    
+    # Should handle exception gracefully and return empty DataFrame
+    with patch("builtins.print") as mock_print:
+        result = mock_rule_checker.rule_check(
+            ast_node=mock_ast_node,
+            extracted_data=extracted_data,
+            filename=filename,
+            function_name=function_name,
+            df_output=df_output,
+        )
+    
+    # Verify error message was printed
+    mock_print.assert_called_once()
+    printed_message = mock_print.call_args[0][0]
+    assert "Error in rule checker" in printed_message
+    assert "test_function" in printed_message
+    assert "mock_file.py" in printed_message
+    
+    # Result should still be valid (empty DataFrame)
+    assert len(result) == 0

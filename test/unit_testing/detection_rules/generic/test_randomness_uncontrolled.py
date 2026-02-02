@@ -96,3 +96,65 @@ def test_detect_unknown_model_no_smell(smell_detector):
 
     result = smell_detector.detect(tree, extracted_data)
     assert len(result) == 0
+
+
+def test_detect_with_attribute_call(smell_detector):
+    """
+    Test detecting smell when using attribute-style calls (e.g., module.function).
+    """
+    code = (
+        "from sklearn import model_selection\n"
+        "def main():\n"
+        "    data = [1, 2, 3]\n"
+        "    train, test = model_selection.train_test_split(data)\n"
+    )
+    tree = ast.parse(code)
+    extracted_data = {
+        "models": {}
+    }
+
+    result = smell_detector.detect(tree, extracted_data)
+    assert len(result) == 1
+    assert result[0]["name"] == "Randomness Uncontrolled"
+    assert "train_test_split" in result[0]["additional_info"]
+
+
+def test_detect_with_non_string_model_methods(smell_detector):
+    """
+    Test that non-string entries in model methods are handled gracefully.
+    """
+    code = (
+        "from sklearn.ensemble import RandomForestClassifier\n"
+        "def main():\n"
+        "    rf = RandomForestClassifier(n_estimators=100)\n"
+    )
+    tree = ast.parse(code)
+    # Include non-string values in method list
+    extracted_data = {
+        "models": {
+            "library": ["sklearn"],
+            "method": ["RandomForestClassifier", None, 123, ""]  # Mix of types
+        }
+    }
+
+    result = smell_detector.detect(tree, extracted_data)
+    assert len(result) == 1
+    assert "RandomForestClassifier" in result[0]["additional_info"]
+
+
+def test_detect_with_unknown_call_type(smell_detector):
+    """
+    Test that complex call expressions (not Name or Attribute) are handled.
+    """
+    code = (
+        "def main():\n"
+        "    # Lambda call or subscript call\n"
+        "    result = (lambda x: x)[0]()\n"
+    )
+    tree = ast.parse(code)
+    extracted_data = {
+        "models": {}
+    }
+
+    result = smell_detector.detect(tree, extracted_data)
+    assert len(result) == 0  # Should not crash, just return empty
