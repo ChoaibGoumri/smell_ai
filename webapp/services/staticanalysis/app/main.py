@@ -1,8 +1,13 @@
 from fastapi import FastAPI
-# when running locally/testing
-""" from webapp.services.staticanalysis.app.routers.detect_smell import router """
-# when deploying in docker
-from app.routers.detect_smell import router
+
+# Dynamic import for local vs docker execution
+try:
+    # Docker import
+    from app.routers.detect_smell import router
+except ImportError:
+    # Local import
+    from webapp.services.staticanalysis.app.routers.detect_smell import router
+
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Static Analysis Service")

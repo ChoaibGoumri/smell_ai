@@ -1,10 +1,7 @@
 import tempfile
 import os
 import pandas as pd
-# when running locally/testing
-""" from webapp.services.staticanalysis.app.schemas.responses import Smell """
-# when deploying in docker
-from app.schemas.responses import Smell
+from ..schemas.responses import Smell
 from components.inspector import Inspector
 
 OUTPUT_DIR = "output"
@@ -15,7 +12,7 @@ def detect_static(code_snippet: str) -> dict:
     try:
         # Create a temporary file to analyze the code snippet
         with tempfile.NamedTemporaryFile(
-            suffix=".py", delete=False, mode="w"
+            suffix=".py", delete=False, mode="w", encoding="utf-8"
         ) as temp_file:
             temp_file.write(code_snippet)
             temp_file_path = temp_file.name
