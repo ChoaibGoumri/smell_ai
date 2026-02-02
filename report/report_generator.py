@@ -107,8 +107,8 @@ class ReportGenerator:
         """
         Generates a summary report with:
         - General overview of code smells.
-        - Per-project summary of total smells.
-        - Detailed sheets for each project.
+        - Per-project summary of total smells and density.
+        - Detailed sheets for each project (smells and file analysis).
         """
         df["project_name"] = df["filename"].apply(
             lambda x: os.path.basename(os.path.dirname(x)) or "root"
@@ -119,12 +119,22 @@ class ReportGenerator:
             .rename("occurrences")
             .reset_index()
         )
-        project_summary = (
+        
+        project_summary_smells = (
             df.groupby("project_name")["smell_name"]
             .count()
             .rename("total_smells")
             .reset_index()
         )
+
+        if "loc" in df.columns:
+            unique_files = df.drop_duplicates(subset=["filename"])
+            project_loc = unique_files.groupby("project_name")["loc"].sum().rename("total_loc").reset_index()
+            project_summary = pd.merge(project_summary_smells, project_loc, on="project_name", how="left")
+            project_summary["density"] = project_summary["total_smells"] / project_summary["total_loc"]
+        else:
+            project_summary = project_summary_smells
+
         output_file = os.path.join(self.output_path, "summary_report.xlsx")
         with pd.ExcelWriter(output_file, engine="openpyxl") as writer:
             general_report.to_excel(
@@ -140,12 +150,33 @@ class ReportGenerator:
                     .rename("occurrences")
                     .reset_index()
                 )
-                sanitized_name = project_name[
-                    :30
-                ]  # Excel sheet names must be <= 31 chars
+                sanitized_name = project_name[:30]
                 details.to_excel(
                     writer, sheet_name=sanitized_name, index=False
                 )
+                
+                if "loc" in project_df.columns:
+                    file_stats = project_df.groupby("filename").agg({
+                        "smell_name": "count",
+                        "loc": "first"
+                    }).reset_index()
+                    file_stats.rename(columns={"smell_name": "smells"}, inplace=True)
+                    file_stats["density"] = file_stats["smells"] / file_stats["loc"]
+                    
+                    def classify(d):
+                        if pd.isna(d): return "Unknown"
+                        if d < 0.005: return "Low"
+                        elif d < 0.05: return "Medium"
+                        else: return "High"
+                    
+                    file_stats["quality"] = file_stats["density"].apply(classify)
+                    file_stats["short_filename"] = file_stats["filename"].apply(os.path.basename)
+                    
+                    file_stats = file_stats[["short_filename", "smells", "loc", "density", "quality", "filename"]]
+                    
+                    files_sheet_name = (project_name[:24] + "_Files")[:31]
+                    file_stats.to_excel(writer, sheet_name=files_sheet_name, index=False)
+        
         print(f"Summary report saved to '{output_file}'.")
 
     def visualize_smell_report(self, df):
@@ -183,7 +214,36 @@ class ReportGenerator:
         """
         try:
             csv_files = self._find_project_details()
-            df = self._load_data(csv_files)
+            
+            metric_files = [f for f in csv_files if "_metrics.csv" in f or "file_metrics.csv" in f]
+            result_files = [f for f in csv_files if f not in metric_files]
+            
+            df = pd.DataFrame()
+            df_results = pd.DataFrame()
+            df_metrics = pd.DataFrame()
+
+            if result_files:
+                df_results = self._load_data(result_files)
+            
+            if metric_files:
+                df_metrics = self._load_data(metric_files)
+                if not df_metrics.empty:
+                    df_metrics.drop_duplicates(subset=['filename'], inplace=True)
+            
+            if not df_metrics.empty and not df_results.empty:
+                df = pd.merge(df_metrics, df_results, on="filename", how="left")
+            elif not df_results.empty:
+                df = df_results
+            elif not df_metrics.empty:
+                df = df_metrics
+                # Ensure smell columns exist for compatibility
+                for col in ["smell_name", "function_name", "project_name"]:
+                    if col not in df.columns:
+                        df[col] = None
+            else:
+                print("No data found to generate reports.")
+                return
+
             choice = self.menu()
             if choice == "1":
                 self.smell_report(df)
@@ -202,6 +262,8 @@ class ReportGenerator:
                 print("Invalid choice. Exiting.")
         except Exception as e:
             print(f"An error occurred: {e}")
+            import traceback
+            traceback.print_exc()
 
 
 def main():

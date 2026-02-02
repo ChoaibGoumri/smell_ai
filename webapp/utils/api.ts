@@ -24,9 +24,9 @@ export async function detectAi(codeSnippet: string): Promise<DetectResponse> {
         });
 
         return {
-                success: response.data.success ? response.data.success : false,
-                smells: Array.isArray(response.data.smells) ? response.data.smells : [],
-            };
+            success: response.data.success ? response.data.success : false,
+            smells: Array.isArray(response.data.smells) ? response.data.smells : [],
+        };
     } catch (error) {
         return handleErrorResponse(error, {
             success: false,
@@ -44,13 +44,16 @@ export async function detectStatic(codeSnippet: string): Promise<DetectResponse>
         });
 
         return {
-                success: response.data.success ? response.data.success : false,
-                smells: Array.isArray(response.data.smells) ? response.data.smells : [],
-            };
-            
+            success: response.data.success ? response.data.success : false,
+            smells: Array.isArray(response.data.smells) ? response.data.smells : [],
+            loc: response.data.loc,
+            density: response.data.density,
+            quality: response.data.quality
+        };
+
     } catch (error) {
-        return handleErrorResponse(error, 
-            {  success: false, smells: null, message: "Error detecting code smells."});
+        return handleErrorResponse(error,
+            { success: false, smells: null, message: "Error detecting code smells." });
     }
 }
 

@@ -10,7 +10,7 @@ import { ContextSmell, DetectResponse } from "@/types/types";
 function ProgressBar({ progress }: { progress: number }) {
   return (
     <motion.div
-      
+
       className="mt-6 w-full bg-gray-200 rounded-full"
       initial={{ width: 0 }}
       animate={{ width: `${progress}%` }}
@@ -36,11 +36,10 @@ function AnalysisModeToggle({
       <div className="flex justify-center space-x-6">
         <motion.button
           onClick={() => setAnalysisMode("AI")}
-          className={`px-8 py-4 rounded-lg font-medium transition-all ${
-            analysisMode === "AI"
-              ? "bg-red-500 text-white shadow-md"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
+          className={`px-8 py-4 rounded-lg font-medium transition-all ${analysisMode === "AI"
+            ? "bg-red-500 text-white shadow-md"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -48,11 +47,10 @@ function AnalysisModeToggle({
         </motion.button>
         <motion.button
           onClick={() => setAnalysisMode("Static")}
-          className={`px-8 py-4 rounded-lg font-medium transition-all ${
-            analysisMode === "Static"
-              ? "bg-blue-500 text-white shadow-md"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-          }`}
+          className={`px-8 py-4 rounded-lg font-medium transition-all ${analysisMode === "Static"
+            ? "bg-blue-500 text-white shadow-md"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -95,19 +93,58 @@ function FileUploadSection({
   );
 }
 
-function Results({ result, fileName }: { result: ContextSmell[] | null; fileName: string }) {
+function MetricsDisplay({ loc, density, quality }: { loc?: number; density?: number; quality?: string }) {
+  if (loc === undefined || loc === null || density === undefined || density === null) return null;
+
+  return (
+    <motion.div
+      className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-6"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Code Quality Metrics</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-500 uppercase font-semibold">Lines of Code</p>
+          <p className="text-3xl font-bold text-gray-800">{loc}</p>
+        </div>
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-500 uppercase font-semibold">Smell Density</p>
+          <p className="text-3xl font-bold text-gray-800">{density.toFixed(4)}</p>
+          <p className="text-xs text-gray-500 mt-1">smells / LOC</p>
+        </div>
+        <div className={`p-4 rounded-lg ${quality === "Low" ? "bg-green-100 border border-green-200" :
+          quality === "Medium" ? "bg-yellow-100 border border-yellow-200" :
+            quality === "High" ? "bg-red-100 border border-red-200" : "bg-gray-50"
+          }`}>
+          <p className="text-sm text-gray-500 uppercase font-semibold">Density Level</p>
+          <p className={`text-3xl font-bold ${quality === "Low" ? "text-green-700" :
+            quality === "Medium" ? "text-yellow-700" :
+              quality === "High" ? "text-red-700" : "text-gray-800"
+            }`}>{quality || "Unknown"}</p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function Results({ result, fileName, loc, density, quality }: { result: ContextSmell[] | null; fileName: string; loc?: number; density?: number; quality?: string }) {
   if (!result) return null;
 
   if (result.length === 0) {
     return (
-      <motion.p
-        className="mt-8 text-xl text-center text-green-600"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        No code smells detected! Your code is clean!
-      </motion.p>
+      <div className="mt-8">
+        <MetricsDisplay loc={loc} density={density} quality={quality} />
+        <motion.p
+          className="mt-8 text-xl text-center text-green-600"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          No code smells detected! Your code is clean!
+        </motion.p>
+      </div>
     );
   }
 
@@ -118,6 +155,8 @@ function Results({ result, fileName }: { result: ContextSmell[] | null; fileName
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      <MetricsDisplay loc={loc} density={density} quality={quality} />
+
       {result.map((smell, index) => (
         <div
           key={index}
@@ -167,6 +206,9 @@ export default function UploadPythonPage() {
   const [fileName, setFileName] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ContextSmell[] | null>(null);
+  const [loc, setLoc] = useState<number | undefined>(undefined);
+  const [density, setDensity] = useState<number | undefined>(undefined);
+  const [quality, setQuality] = useState<string | undefined>(undefined);
   const [analysisMode, setAnalysisMode] = useState<"AI" | "Static">("AI");
   const [progress, setProgress] = useState<number>(0);
 
@@ -186,7 +228,7 @@ export default function UploadPythonPage() {
 
     const fileContent = await file.text();
 
-    if(!fileContent) {
+    if (!fileContent) {
       setIsLoading(false);
       setProgress(100)
       toast.error("Code Snippet cannot be empty.");
@@ -204,19 +246,23 @@ export default function UploadPythonPage() {
 
     setProgress(70);
 
-    if(!data.success) {
+    if (!data.success) {
       toast.error(`Error: Failed to analyze code.`);
       setIsLoading(false);
       setProgress(100);
       return;
     }
 
-    if (data.smells) {
+    if (data.smells !== undefined) {
       setResult(data.smells);
+      setLoc(data.loc);
+      setDensity(data.density);
+      setQuality(data.quality);
+
       toast.success("Code uploaded and analyzed successfully!");
       setIsLoading(false);
-      setProgress(100);    
-      
+      setProgress(100);
+
     } else {
       toast.error("Unexpected API response format");
       setIsLoading(false);
@@ -252,9 +298,8 @@ export default function UploadPythonPage() {
           {/* Submit Button */}
           <motion.button
             onClick={handleSubmit}
-            className={`w-full px-8 py-4 rounded-lg shadow-md transition-all font-medium ${
-              isLoading ? "bg-red-500 text-white" : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
+            className={`w-full px-8 py-4 rounded-lg shadow-md transition-all font-medium ${isLoading ? "bg-red-500 text-white" : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
             disabled={isLoading}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -273,7 +318,7 @@ export default function UploadPythonPage() {
           {isLoading && <ProgressBar progress={progress} />}
 
           {/* Results */}
-          <Results result={result} fileName={fileName} />
+          <Results result={result} fileName={fileName} loc={loc} density={density} quality={quality} />
         </div>
       </main>
 

@@ -34,7 +34,7 @@ class Inspector:
         self.output_path = output_path
         self._setup(dataframe_dict_path, model_dict_path, tensor_dict_path)
 
-    def inspect(self, filename: str) -> pd.DataFrame:
+    def inspect(self, filename: str) -> tuple:
         """
         Inspects a file for code smells by parsing it into an AST and applying
         rules.
@@ -43,7 +43,7 @@ class Inspector:
         - filename (str): The name of the file to analyze.
 
         Returns:
-        - pd.DataFrame: A DataFrame containing detected code smells.
+        - tuple: (pd.DataFrame, int) A tuple containing the detected smells DataFrame and the line count.
         """
         col = [
             "filename",
@@ -139,7 +139,7 @@ class Inspector:
             print(f"Unexpected error while analyzing file '{filename}': {e}")
             raise e
 
-        return to_save
+        return to_save, len(lines)
 
     def _setup(
         self,
