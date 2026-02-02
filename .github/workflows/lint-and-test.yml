@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main, feature/oop-refactor ]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -17,6 +18,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+          cache: 'pip'
 
       - name: Install system dependencies (GUI)
         run: |
@@ -27,6 +29,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Run flake8 linter
+        run: |
+          flake8 --exclude=projects/example,input/dataset --statistics
+        continue-on-error: true
 
       - name: Run tests with coverage
         run: |
@@ -42,5 +49,6 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml
-          fail_ci_if_error: true
+          files: ./coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
