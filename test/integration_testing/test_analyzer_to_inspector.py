@@ -22,17 +22,20 @@ def test_project_analyzer_calls_inspect(
     mock_inspector_class, project_analyzer_setup
 ):
     mock_instance = Mock()
-    mock_instance.inspect.return_value = pd.DataFrame(
-        [
-            {
-                "filename": "test_file1.py",
-                "function_name": "main",
-                "smell_name": "TestSmell",
-                "line": 1,
-                "description": "Mocked smell",
-                "additional_info": "None",
-            }
-        ]
+    mock_instance.inspect.return_value = (
+        pd.DataFrame(
+            [
+                {
+                    "filename": "test_file1.py",
+                    "function_name": "main",
+                    "smell_name": "TestSmell",
+                    "line": 1,
+                    "description": "Mocked smell",
+                    "additional_info": "None",
+                }
+            ]
+        ),
+        100  # LOC
     )
     mock_inspector_class.return_value = mock_instance
 

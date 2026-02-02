@@ -77,7 +77,8 @@ class FileUtils:
 
         for subdir, _, files in os.walk(input_dir):
             for file in files:
-                if file.endswith(".csv"):
+                # Only merge result files, not metrics files
+                if file.endswith("_results.csv"):
                     file_path = os.path.join(subdir, file)
                     try:
                         df = pd.read_csv(file_path)

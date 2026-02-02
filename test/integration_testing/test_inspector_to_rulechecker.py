@@ -61,7 +61,7 @@ def test_inspector_to_rulechecker(
 
     inspector = Inspector(output_path="output")
 
-    result = inspector.inspect(inspector_setup)
+    result, loc = inspector.inspect(inspector_setup)
 
     mock_library_extractor.return_value.extract_libraries.assert_called_once()
     mock_dataframe_instance = mock_dataframe_extractor.return_value

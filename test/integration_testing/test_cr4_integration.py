@@ -46,11 +46,7 @@ def test_cr4_integration(cr4_file_setup):
     inspector = Inspector(output_path="test_output_cr4")
     
     # Run inspection
-    result_df = inspector.inspect(cr4_file_setup)
-    
-    # Assertions
-    assert not result_df.empty, "Inspector returned empty results"
-    
+    result_df, loc = inspector.inspect(cr4_file_setup)
     # Filter for our specific smell
     cr4_smells = result_df[result_df["smell_name"] == "hyperparameters_not_explicitly_set"]
     

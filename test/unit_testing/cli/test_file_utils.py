@@ -106,9 +106,10 @@ def test_merge_results(mock_merge):
     mock_makedirs, mock_walk, mock_read_csv, mock_to_csv = mock_merge
 
     # Mock os.walk to simulate the directory structure and files
-    mock_walk.return_value = [("mock_input", [], ["file1.csv", "file2.csv"])]
+    # Files should end with _results.csv to be merged
+    mock_walk.return_value = [("mock_input", [], ["project1_results.csv", "project2_results.csv", "project1_metrics.csv"])]
 
-    # Mock pandas read_csv for the two files
+    # Mock pandas read_csv for the two result files (metrics file should be ignored)
     mock_read_csv.side_effect = [
         pd.DataFrame({"filename": ["file1"], "data": [1]}),  # Not empty
         pd.DataFrame({"filename": ["file2"], "data": [2]}),  # Not empty
