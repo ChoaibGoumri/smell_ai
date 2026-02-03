@@ -57,6 +57,7 @@ The static analysis tool detects **ML-specific code smells** through rule-based 
 | Memory Not Freed                        | Failing to free memory for ML models declared in loops.                    |
 | Merge API Parameter Not Explicitly Set  | Missing explicit `how` and `on` parameters in Pandas merge operations.     |
 | NaN Equivalence Comparison Misused      | Incorrect comparison of values with `np.nan`.                              |
+| Randomness Uncontrolled                 | The algorithm involves randomness but no seed/random_state is fixed.       |
 | Unnecessary Iteration                   | Using explicit loops instead of Pandas vectorized operations.              |
 
 #### AI-Specific Code Smells
