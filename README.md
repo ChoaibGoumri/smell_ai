@@ -52,7 +52,7 @@ The static analysis tool detects **ML-specific code smells** through rule-based 
 | Columns and DataType Not Explicitly Set | DataFrames created without explicitly setting column names and data types. |
 | Deterministic Algorithm Option Not Used | This smell occurs when the option `torch.use_deterministic_algorithms(True)` is not removed.|
 | Empty Column Misinitialization          | Initializing DataFrame columns with zeros or empty strings.                |
-| Hyperparameters Not Explicitly Set      | Missing explicit hyperparameter definitions for ML models.                 |
+| Hyperparameters Not Explicitly Set      | Missing explicit definitions for critical hyperparameters in ML models.    |
 | In-Place APIs Misused                   | Assuming Pandas methods modify DataFrames in-place without reassignment.   |
 | Memory Not Freed                        | Failing to free memory for ML models declared in loops.                    |
 | Merge API Parameter Not Explicitly Set  | Missing explicit `how` and `on` parameters in Pandas merge operations.     |
