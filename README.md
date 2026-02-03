@@ -40,6 +40,7 @@ The static analysis tool detects **ML-specific code smells** through rule-based 
 - **Static Code Analysis**: Identifies ML-specific code smells.
 - **Execution Modes**: Supports **CLI** for batch processing and an **interactive GUI**.
 - **Code Quality Insights**: Generates detailed reports on identified code smells, including location and remediation hints.
+- **Real-time Progress**: CLI execution includes a progress bar for tracking analysis status.
 
 ### Code Smells Detected
 
