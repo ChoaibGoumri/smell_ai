@@ -8,6 +8,7 @@ CodeSmile WebApp is a web-based application that performs AI-driven and static a
 - **Report Service**: Generate and download detailed reports of analyzed code.
 - **Gateway**: API Gateway that orchestrates requests across services.
 - **Frontend WebApp**: User-friendly interface to interact with all services.
+- **Quality Dashboard**: Visualizes file metrics including **Lines of Code (LOC)**, **Smell Density**, and **Quality Level**.
 
 ## **Getting Started**
 

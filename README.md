@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/ChoaibGoumri/smell_ai/graph/badge.svg)](https://codecov.io/gh/ChoaibGoumri/smell_ai)
+
 <p align="center">
   <img src="./code_smile_logo.png" alt="CodeSmile" width="200"/>
 </p>
@@ -40,6 +42,7 @@ The static analysis tool detects **ML-specific code smells** through rule-based 
 - **Static Code Analysis**: Identifies ML-specific code smells.
 - **Execution Modes**: Supports **CLI** for batch processing and an **interactive GUI**.
 - **Code Quality Insights**: Generates detailed reports on identified code smells, including location and remediation hints.
+- **Metric Calculation**: Computes **Smell Density** (Smells/LOC) and assigns a **Quality Rating** (Low, Medium, High) to analyzed files.
 - **Real-time Progress**: CLI execution includes a progress bar for tracking analysis status.
 
 ### Code Smells Detected
