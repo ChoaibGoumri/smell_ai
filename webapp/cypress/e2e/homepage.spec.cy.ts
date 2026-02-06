@@ -2,15 +2,15 @@ Cypress.config('defaultCommandTimeout', 10000);
 
 describe('Homepage', () => {
   it('should load the homepage and display the correct title', () => {
-    cy.visit('http://localhost:3000'); 
-    cy.title().should('include', 'CodeSmile'); 
+    cy.visit('http://localhost:3000');
+    cy.title().should('include', 'CodeSmile');
     cy.get('h1').should('contain', 'Welcome to CodeSmile Web-App');
   });
 
   it('should navigate to the upload-python page when "Analyze Python Code" button is clicked', () => {
     cy.visit('http://localhost:3000');
-    cy.contains('Analyze Python Code').click(); 
-    cy.url().should('include', '/upload-python'); 
+    cy.contains('Analyze Python Code').click();
+    cy.url().should('include', '/upload-python');
   });
 
   it('should navigate to the upload-project page when "Analyze Project" button is clicked', () => {

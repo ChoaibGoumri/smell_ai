@@ -45,7 +45,7 @@ describe("UploadPythonPage Component", () => {
     expect(staticButton).toHaveClass("bg-blue-500");
     expect(aiButton).toHaveClass("bg-gray-200");
   });
-  
+
   it("handles file upload correctly", async () => {
     render(<UploadPythonPage />);
 
@@ -138,6 +138,45 @@ describe("UploadPythonPage Component", () => {
 
     await waitFor(() => {
       expect(screen.queryByTestId("progress")).not.toBeInTheDocument();
+    });
+  });
+
+  it("displays smell density metrics when analysis returns them", async () => {
+    (detectAi as jest.Mock).mockResolvedValueOnce({
+      success: true,
+      smells: [],
+      loc: 100,
+      density: 0.05,
+      quality: "High",
+    });
+
+    render(<UploadPythonPage />);
+
+    const fileInput = screen.getByLabelText(/Select a Python File/i);
+    const file = new File(["mock file content"], "test.py", { type: "text/x-python" });
+
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValueOnce("mock file content"),
+    });
+
+    await act(async () => {
+      fireEvent.change(fileInput, { target: { files: [file] } });
+    });
+
+    const submitButton = screen.getByText(/Upload Code/i);
+
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Code Quality Metrics")).toBeInTheDocument();
+      expect(screen.getByText("Lines of Code")).toBeInTheDocument();
+      expect(screen.getByText("100")).toBeInTheDocument();
+      expect(screen.getByText("Smell Density")).toBeInTheDocument();
+      expect(screen.getByText("0.0500")).toBeInTheDocument(); // .toFixed(4)
+      expect(screen.getByText("Density Level")).toBeInTheDocument();
+      expect(screen.getByText("High")).toBeInTheDocument();
     });
   });
 
